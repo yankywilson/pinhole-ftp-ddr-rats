@@ -1,0 +1,42 @@
+title: PINHOLE Persistent PowerShell Child From Pseudoword Binary
+id: 7a1b2c3d-4e5f-4061-9b0c-1d2e3f4a5b6c
+status: experimental
+description: |
+    PINHOLE spawns powershell.exe exactly once (opcode 12), parented to a
+    randomly-named binary in %LOCALAPPDATA% whose name is 10-15 lowercase letters
+    that start with a vowel and alternate consonant/vowel, wired to anonymous pipes
+    for stdin/stdout. Subsequent commands (opcode 13) run inside that same process
+    via stdin, so you see ONE PowerShell creation with an empty/near-empty command
+    line, not repeated spawns.
+references:
+    - docs/03-pinhole-command-protocol.md
+author: independent analysis
+date: 2026/09/01
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - attack.defense-evasion
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection_parent:
+        ParentImage|re: '\\Users\\[^\\]+\\AppData\\Local\\[a-z]{10,15}\.exe$'
+    selection_child:
+        Image|endswith: '\powershell.exe'
+    filter_has_args:
+        CommandLine|contains:
+            - '-enc'
+            - '-EncodedCommand'
+            - '-File'
+            - '-Command'
+    condition: selection_parent and selection_child and not filter_has_args
+fields:
+    - Image
+    - ParentImage
+    - CommandLine
+    - User
+falsepositives:
+    - Rare. Some installers drop random-named binaries; correlate with the curl
+      '##STATUS##' marker or network activity for confirmation.
+level: high

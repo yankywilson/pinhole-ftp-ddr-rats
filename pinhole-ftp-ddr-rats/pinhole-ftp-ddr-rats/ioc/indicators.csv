@@ -1,0 +1,51 @@
+type,indicator,context,family,confidence,first_seen,notes
+sha256,a7d3e9020e4b978183a0652027a63dc0181c77a16e41279a22c07fbc93c3bc58,PINHOLE final-stage RAT (x64),PINHOLE,high,2026-08-29,"compiled 2026-08-29 19:21:13 UTC; primary RE target"
+md5,f96b4ee5565377a3caf9cc39f386160f,PINHOLE final-stage RAT (x64),PINHOLE,high,2026-08-29,same file as sha256 above
+sha256,78cd264a29e21b79035772faa4615e2bb1d795d15983ab1a3bc4e25d262e3840,PINHOLE Layer-1 fake-JPEG container (/api/bc),PINHOLE,high,2026-08-31,build-specific
+sha256,d967503987466c0800641245fd58fcac54ce75e1c0f9eb8a4a5246f3167714ca,PINHOLE Layer-2 container (post de-JPEG),PINHOLE,high,2026-08-31,derived artifact
+sha256,89495a1b14cf37d1824af6937956efdc748ea3edb0e84c1e82d89b60cba451b1,PINHOLE loader stage (decoded),PINHOLE,high,2026-08-31,"15552 bytes; size is cross-build stable"
+sha256,20d82376e6ca5640d1e01f8e6862b8c6b1cc0c0c72e89651f5520f8cc3774137,PINHOLE Donut instance (decrypted),PINHOLE,high,2026-08-31,derived artifact
+sha256,af769f3bff848bac7b73bf749769424b3df6c9175388980d99e0d6d0193237ba,PINHOLE/STRU second-stage (reported),PINHOLE,moderate,2026-08-21,"from STRU; not on VT/MB/Triage as of 2026-08-31 - unconfirmed"
+sha256,4712f4825169bbe8dc718cb97e8680192775e935b341d6650c7863038a77d8d1,E4del bundle Build B (from 51.89.199.125/i),E4del,high,2026-08-25,"plaintext index.js; source of new C2"
+sha1,0a2fc65336765d152f6de355340c51adca47c823,E4del bundle Build B,E4del,high,2026-08-25,same file
+md5,dcf1aa31b3ebe1d9343c239dea04ef1d,E4del bundle Build B,E4del,high,2026-08-25,same file
+sha256,c25fd7e24d2e59cd23901585a0d856ff3e0aece91298975b9f22d210a677afb7,E4del Build B app.asar,E4del,high,2026-08-25,trojanized Discord asar
+sha256,2cb20f04bef481b0b77f32f5cf592caacfb721656da21ba2b64315941575851d,E4del bundle Build A (from 54.37.237.164),E4del,high,2026-08-15,"index.js VM-obfuscated; C2 unrecovered"
+sha256,703d78acf38989108e716a523ce6ac429fac2f2bc6ed3797ddf5629a9d98c23b,E4del Build A app.asar,E4del,high,2026-08-15,VM-obfuscated
+sha256,117b2b7e7c0deee1f7bf0f154babc09738eac18e810625fab4f54dc8088d731c,E4del d.zip bundle (STRU published),E4del,moderate,2026-08-21,from STRU report
+sha256,fcc6fdf40f4dea8f508ef0b8c45a657461310a3f7947a8c687b476e0f0b41e26,E4del app.asar (STRU published),E4del,moderate,2026-08-21,from STRU report
+ipv4,51.89.199.118,E4del C2 (Build B),E4del,high,2026-08-25,"NEW - recovered via independent analysis, not in public reporting"
+ipv4,51.89.199.125,E4del payload delivery host (Build B),E4del,high,2026-08-25,serves /i
+ipv4,54.37.237.164,E4del payload delivery host (Build A),E4del,high,2026-08-15,
+ipv4,54.37.237.166,E4del related host,E4del,moderate,2026-08-15,
+ipv4,157.254.194.31,E4del C2 (STRU published build),E4del,moderate,2026-08-21,from STRU
+ipv4,167.148.41.164,E4del payload host (STRU published),E4del,moderate,2026-08-21,from STRU
+ipv4,209.99.185.38,PINHOLE delivery + FTP banner + stats panel,PINHOLE,high,2026-08-25,
+ipv4,69.48.228.126,FTP stats panel host,PINHOLE,moderate,2026-08-25,conhost --headless + farolesa.mx WebDAV
+ipv4,45.61.136.50,campaign-related host,shared,moderate,2026-08,
+ipv4,104.21.44.124,Cloudflare anycast (farolesa.mx / workers.dev front),infra,low,2026-08,"anycast - do NOT block; enrichment only"
+ipv4,104.21.85.250,Cloudflare anycast,infra,low,2026-08,anycast - do NOT block
+ipv4,172.67.199.190,Cloudflare anycast (www.farolesa.mx),infra,low,2026-08,anycast - do NOT block
+ipv4,172.67.212.254,Cloudflare anycast (workers.dev),infra,low,2026-08,anycast - do NOT block
+domain,farolesa.mx,PINHOLE staging domain,PINHOLE,high,2024-07-05,"registered 2024-07-05; NS rotated Jun 2026; live at analysis"
+domain,www.farolesa.mx,PINHOLE staging (Cloudflare proxied),PINHOLE,moderate,2024-07-05,origin hidden
+domain,verificar.farolesa.mx,PINHOLE WebDAV host,PINHOLE,moderate,2026-08,"WebDAV \\verificar.farolesa.mx@80\pub\Verificar.js; DNS not re-confirmed - OPEN"
+domain,nokierojotiarmx.com,PINHOLE C2 behind Cloudflare Worker,PINHOLE,moderate,2026-08,
+domain,worker-1785198984-xsekhi.api-62c3cac6.workers.dev,PINHOLE Cloudflare Worker C2 proxy,PINHOLE,moderate,2026-07-28,"epoch in name -> 2026-07-28 (candidate decode, OPEN)"
+url,https://mx.pinterest.com/pin/1128292512937332995,PINHOLE DDR resolver (Pinterest pin),PINHOLE,high,2026-08,liveness not re-confirmed post-disclosure
+url,https://mx.pinterest.com/pin/1128292512937332894,PINHOLE DDR resolver (Pinterest pin),PINHOLE,high,2026-08,liveness not re-confirmed post-disclosure
+url,https://www.surveymonkey.com/r/WW5NVT6,PINHOLE DDR resolver (tertiary),PINHOLE,moderate,2026-08,never queried in observed runs
+uri,/api/vncpc,PINHOLE C2 endpoint (vnc module),PINHOLE,high,2026-08-29,NOVEL - not in public reporting
+uri,/api/stlbrwsr,PINHOLE C2 endpoint (browser stealer),PINHOLE,high,2026-08-29,
+uri,/api/client,PINHOLE C2 registration endpoint,PINHOLE,high,2026-08-29,plaintext on disk
+uri,/api/tsk,PINHOLE C2 task-poll endpoint,PINHOLE,high,2026-08-29,plaintext on disk
+uri,/api/fls,PINHOLE C2 file service,PINHOLE,high,2026-08-29,plaintext on disk
+uri,/api/bc,PINHOLE second-stage container delivery,PINHOLE,high,2026-08-29,
+uri,/api/health,PINHOLE C2 heartbeat,PINHOLE,high,2026-08-29,
+uri,/ws/ds,E4del WebSocket command channel,E4del,high,2026-08-25,
+uri,/ws/agent,E4del unencrypted desktop stream,E4del,high,2026-08-25,can target a different IP than C2
+string,##STATUS##,PINHOLE curl HTTP-status marker (in-memory),PINHOLE,high,2026-08-29,"host signature; encrypted on disk, plaintext in memory"
+string,___PWSH_END_%08X___,PINHOLE persistent-PowerShell output sentinel,PINHOLE,high,2026-08-29,plaintext on disk
+string,%e4del%,E4del field/pipe delimiter,E4del,high,2026-08-25,
+filename_regex,"%LOCALAPPDATA%\\[a-z]{10,15}(\\[a-z]{10,15})?\.exe",PINHOLE/E4del pseudoword drop,shared,moderate,2026-08,vowel-initial alternating; post-filter to reduce FP
+port,5000,FTP stats panel,PINHOLE,moderate,2026-08,operator infrastructure - hunt siblings via Censys/Shodan
