@@ -1,0 +1,122 @@
+# PINHOLE / E4del - Suricata rules
+# Independent analysis. See docs/04-network-and-c2.md and docs/08-e4del-analysis.md.
+#
+# Tuning before deployment:
+#   - Set $HOME_NET to your internal ranges.
+#   - Define $FTP_SERVERS as your legitimate FTP hosts (used to exclude them).
+#   - If you legitimately use *.workers.dev, scope sid:2810004 accordingly.
+#
+# SID block 2810000-2810099 reserved for this ruleset (local range).
+# All rules are behavioural/correlation aids for a DDR family whose C2 IPs rotate;
+# do NOT rely on IP blocklists (see docs/05-detection-guide.md).
+
+# ---------------------------------------------------------------------------
+# 1. Delivery: outbound FTP to a non-corporate server (banner dead-drop read)
+# ---------------------------------------------------------------------------
+alert ftp $HOME_NET any -> !$HOME_NET 21 (
+    msg:"PINHOLE/E4del DDR - outbound FTP to external host (possible banner dead-drop read)";
+    flow:to_server,established;
+    threshold:type limit, track by_src, count 1, seconds 300;
+    classtype:trojan-activity;
+    reference:url,socradar.io/blog/ftp-banners-new-dead-drop-resolver-rats/;
+    metadata:analysis independent, tlp clear;
+    sid:2810001; rev:1;
+)
+
+# FTP banner containing living-off-the-land download primitives (server side).
+# Catches the resolver banners themselves on the wire.
+alert ftp !$HOME_NET 21 -> $HOME_NET any (
+    msg:"PINHOLE/E4del DDR - FTP greeting banner carries LOLbin download primitive";
+    flow:from_server,established;
+    content:"220"; depth:3;
+    pcre:"/(System\.Net\.WebClient|bitsadmin|conhost\.exe --headless|powershell)/i";
+    classtype:trojan-activity;
+    metadata:analysis independent, tlp clear;
+    sid:2810002; rev:1;
+)
+
+# ---------------------------------------------------------------------------
+# 2. DDR resolution: fetch of the known resolver pages
+#    (Pinterest pin / SurveyMonkey survey used to stage the real C2)
+# ---------------------------------------------------------------------------
+alert http $HOME_NET any -> any any (
+    msg:"PINHOLE DDR - retrieval of known Pinterest dead-drop resolver pin";
+    flow:to_server,established;
+    http.host; content:"pinterest.com"; nocase;
+    http.uri; content:"/pin/1128292512937332"; fast_pattern;
+    classtype:trojan-activity;
+    reference:url,socradar.io/blog/ftp-banners-new-dead-drop-resolver-rats/;
+    metadata:analysis independent, tlp clear;
+    sid:2810003; rev:1;
+)
+
+alert http $HOME_NET any -> any any (
+    msg:"PINHOLE DDR - retrieval of known SurveyMonkey dead-drop resolver";
+    flow:to_server,established;
+    http.host; content:"surveymonkey.com"; nocase;
+    http.uri; content:"/r/WW5NVT6"; fast_pattern;
+    classtype:trojan-activity;
+    metadata:analysis independent, tlp clear;
+    sid:2810005; rev:1;
+)
+
+# ---------------------------------------------------------------------------
+# 3. C2 shape: PINHOLE's custom Schannel HTTP client omits User-Agent entirely
+#    and talks to a Cloudflare Worker. Very weak alone - ENRICHMENT ONLY.
+# ---------------------------------------------------------------------------
+alert http $HOME_NET any -> any any (
+    msg:"PINHOLE C2 (weak/enrichment) - HTTP request to workers.dev with no User-Agent";
+    flow:to_server,established;
+    http.host; content:".workers.dev"; nocase; endswith;
+    http.header_names; content:!"User-Agent"; nocase;
+    threshold:type limit, track by_src, count 1, seconds 600;
+    classtype:trojan-activity;
+    metadata:analysis independent, tlp clear, confidence low;
+    sid:2810004; rev:1;
+)
+
+# PINHOLE endpoint paths (apply on the origin leg if the Worker is bypassed, or
+# on TLS-inspected traffic). Enrichment-grade; combine with the flows above.
+alert http $HOME_NET any -> any any (
+    msg:"PINHOLE C2 (weak/enrichment) - request to /api/vncpc or /api/stlbrwsr";
+    flow:to_server,established;
+    http.uri; pcre:"/^\/api\/(vncpc|stlbrwsr)/";
+    classtype:trojan-activity;
+    metadata:analysis independent, tlp clear, confidence low;
+    sid:2810006; rev:1;
+)
+
+# ---------------------------------------------------------------------------
+# 4. E4del: custom WebSocket transport /ws/ds and the unencrypted stream /ws/agent
+#    New C2 51.89.199.118 recovered from Build B (not in public reporting).
+# ---------------------------------------------------------------------------
+alert http $HOME_NET any -> any any (
+    msg:"E4del C2 - WebSocket upgrade to /ws/ds command channel";
+    flow:to_server,established;
+    http.method; content:"GET";
+    http.uri; content:"/ws/ds"; fast_pattern;
+    http.uri; content:"hostId="; distance:0;
+    http.header; content:"Upgrade|3a| websocket"; nocase;
+    classtype:trojan-activity;
+    reference:url,socradar.io/blog/ftp-banners-new-dead-drop-resolver-rats/;
+    metadata:analysis independent, tlp clear;
+    sid:2810007; rev:1;
+)
+
+alert http $HOME_NET any -> any any (
+    msg:"E4del - unencrypted desktop stream WebSocket /ws/agent";
+    flow:to_server,established;
+    http.uri; content:"/ws/agent"; fast_pattern;
+    http.uri; content:"hostId="; distance:0;
+    classtype:trojan-activity;
+    metadata:analysis independent, tlp clear;
+    sid:2810008; rev:1;
+)
+
+alert ip $HOME_NET any -> 51.89.199.118 any (
+    msg:"E4del C2 - traffic to Build B C2 51.89.199.118 (recovered via independent analysis, not in public reporting)";
+    threshold:type limit, track by_src, count 1, seconds 600;
+    classtype:trojan-activity;
+    metadata:analysis independent, tlp clear;
+    sid:2810009; rev:1;
+)
